@@ -16,29 +16,10 @@ services:
   ollama:
     image: ollama/ollama:latest
     restart: unless-stopped
-    environment:
-      - OLLAMA_KEEP_ALIVE=24h
     volumes:
       - ollama_data:/root/.ollama
-    ports:
-      - "11434:11434"
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "bash",
-          "-lc",
-          "curl -sf http://localhost:11434/api/tags >/dev/null",
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 30
-    entrypoint: ["/bin/sh", "-lc"]
-    command: >
-      "ollama serve & 
-       until curl -sf http://localhost:11434/api/tags >/dev/null; do sleep 1; done;
-       ollama pull mistral:7b;
-       wait"
+    # The image's ENTRYPOINT is "ollama"; we only need to pass the subcommand:
+    command: ["serve"]
 
   api:
     build:
@@ -48,7 +29,7 @@ services:
       db:
         condition: service_started
       ollama:
-        condition: service_healthy
+        condition: service_started
     environment:
       - DB_PATH=/data/contracts.db
       - PROVIDER=ollama
