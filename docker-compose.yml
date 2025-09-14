@@ -54,6 +54,8 @@ services:
         condition: service_started
     environment:
       - API_URL=http://api:8000
+    volumes:
+      - ./client:/app/client
     # Keep the container running
     command: ["tail"]
 
