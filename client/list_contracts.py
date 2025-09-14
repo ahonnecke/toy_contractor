@@ -19,7 +19,7 @@ def list_contracts(base_url="http://api:8000", max_retries=5, retry_delay=2):
     for attempt in range(max_retries):
         try:
             print(f"Attempt {attempt+1}/{max_retries}")
-            response = requests.get(f"{base_url}/contracts/", timeout=10)
+            response = requests.get(f"{base_url}/contracts/", timeout=60)  # 1 minute timeout
             response.raise_for_status()
             contracts = response.json()
             

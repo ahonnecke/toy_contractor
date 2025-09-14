@@ -30,7 +30,7 @@ def create_contract(title, description, base_url="http://api:8000", max_retries=
             response = requests.post(
                 f"{base_url}/contracts/", 
                 json=data,
-                timeout=30  # Longer timeout for contract generation
+                timeout=300  # 5 minute timeout for contract generation
             )
             response.raise_for_status()
             result = response.json()

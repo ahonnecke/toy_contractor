@@ -30,7 +30,7 @@ def refine_contract(contract_id, refinement_prompt, base_url="http://api:8000", 
             response = requests.post(
                 f"{base_url}/contracts/refine/", 
                 json=data,
-                timeout=30  # Longer timeout for contract refinement
+                timeout=300  # 5 minute timeout for contract refinement
             )
             response.raise_for_status()
             result = response.json()

@@ -18,13 +18,28 @@ async def startup_event():
     await db.init_db()
     print("Database initialized successfully.")
     
-    # Test the Ollama connection
+    # Just check if Ollama is reachable without generating text
+    print("Checking if Ollama service is reachable...")
     try:
-        test_response = await llm.generate_contract("Test contract generation")
-        print(f"Ollama test response: {test_response[:50]}...")
+        # This will just ping Ollama without generating text
+        await llm.check_ollama_connection()
+        print("Ollama service is reachable.")
     except Exception as e:
-        print(f"Warning: Ollama test failed: {e}")
+        print(f"Warning: Ollama connection check failed: {e}")
         print("API will continue to run, but contract generation may not work properly.")
+    
+    # Start a background task to warm up the model
+    asyncio.create_task(warm_up_model())
+
+async def warm_up_model():
+    """Warm up the LLM model in the background"""
+    print("Warming up LLM model in the background...")
+    try:
+        # Use a very simple prompt to warm up the model
+        await llm.generate_contract("Test")
+        print("Model warm-up complete.")
+    except Exception as e:
+        print(f"Model warm-up failed: {e}")
 
 
 

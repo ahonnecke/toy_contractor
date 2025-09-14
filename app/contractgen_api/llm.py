@@ -93,3 +93,21 @@ async def _generate_with_ollama(description: str) -> str:
             print(f"Error generating contract: {e}")
             # Return a fallback response for development
             return f"Error: {str(e)}. Using mock contract for: {description[:100]}..."
+
+
+async def check_ollama_connection() -> bool:
+    """
+    Check if the Ollama service is reachable without generating text
+    
+    Returns:
+        bool: True if Ollama is reachable, False otherwise
+    """
+    async with httpx.AsyncClient(timeout=5.0) as client:
+        try:
+            # Just check if the Ollama API is reachable
+            response = await client.get(f"{OLLAMA_HOST}/api/tags")
+            response.raise_for_status()
+            return True
+        except Exception as e:
+            print(f"Error checking Ollama connection: {e}")
+            raise
