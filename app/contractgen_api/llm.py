@@ -28,6 +28,19 @@ async def _generate_with_ollama(description: str) -> str:
     """
     
     async with httpx.AsyncClient() as client:
+        # First try to pull the model if it doesn't exist
+        try:
+            print(f"Attempting to pull model {MODEL}...")
+            pull_response = await client.post(
+                f"{OLLAMA_HOST}/api/pull",
+                json={"name": MODEL},
+                timeout=120.0
+            )
+            print(f"Pull response: {pull_response.status_code}")
+        except Exception as e:
+            print(f"Error pulling model: {e}")
+        
+        # Now try to generate text
         response = await client.post(
             f"{OLLAMA_HOST}/api/generate",
             json={
@@ -35,11 +48,14 @@ async def _generate_with_ollama(description: str) -> str:
                 "prompt": prompt,
                 "stream": False
             },
-            timeout=60.0
+            timeout=120.0
         )
         
         if response.status_code != 200:
             raise Exception(f"Ollama API error: {response.text}")
         
         result = response.json()
+        # Chat API returns a different structure than the generate API
+        if "message" in result:
+            return result.get("message", {}).get("content", "")
         return result.get("response", "")

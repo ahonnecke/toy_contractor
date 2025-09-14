@@ -42,8 +42,10 @@ services:
     ports:
       - "8000:8000"
     restart: unless-stopped
-    
+
   client:
+    stdin_open: true
+    tty: true
     build:
       context: .
       dockerfile: client.Dockerfile
