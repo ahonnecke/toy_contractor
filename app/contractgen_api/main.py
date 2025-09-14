@@ -21,6 +21,11 @@ class ContractRequest(BaseModel):
     description: str
 
 
+class RefinementRequest(BaseModel):
+    contract_id: int
+    refinement_instructions: str
+
+
 @app.get("/")
 async def root():
     return {"message": "Contract Generation API is running"}
@@ -69,3 +74,36 @@ async def get_contract(contract_id: int):
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy"}
+
+
+@app.post("/contracts/refine/", response_model=Contract)
+async def refine_contract(request: RefinementRequest):
+    """Refine an existing contract based on the provided instructions"""
+    try:
+        # Get the existing contract
+        existing_contract = await db.get_contract(request.contract_id)
+        if not existing_contract:
+            raise HTTPException(status_code=404, detail="Contract not found")
+        
+        # Create refinement prompt
+        refinement_prompt = f"""Original Contract: 
+{existing_contract['content']}
+
+Refinement Instructions: 
+{request.refinement_instructions}
+
+Please provide a complete, refined version of this contract that incorporates the refinement instructions.
+"""
+        
+        # Generate refined content
+        refined_content = await llm.generate_contract(refinement_prompt)
+        
+        # Save refined contract
+        refined_title = f"{existing_contract['title']} (Refined)"
+        contract_id = await db.save_contract(refined_title, refined_content)
+        
+        return Contract(id=contract_id, title=refined_title, content=refined_content)
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(status_code=500, detail=str(e))
