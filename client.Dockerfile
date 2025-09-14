@@ -8,6 +8,7 @@ RUN pip install --no-cache-dir httpx
 # Copy the client script
 COPY api_client.py /app/api_client.py
 RUN chmod +x /app/api_client.py
+RUN pip install requests
 
 # Create a wrapper script
 RUN echo '#!/bin/bash' > /app/entrypoint.sh && \

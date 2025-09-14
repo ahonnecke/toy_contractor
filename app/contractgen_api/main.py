@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
 import os
+import asyncio
 from typing import List, Optional
 
 # Import local modules
@@ -8,6 +9,23 @@ from . import db
 from . import llm
 
 app = FastAPI(title="Contract Generation API")
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize the database on startup"""
+    print("Initializing database...")
+    await db.init_db()
+    print("Database initialized successfully.")
+    
+    # Test the Ollama connection
+    try:
+        test_response = await llm.generate_contract("Test contract generation")
+        print(f"Ollama test response: {test_response[:50]}...")
+    except Exception as e:
+        print(f"Warning: Ollama test failed: {e}")
+        print("API will continue to run, but contract generation may not work properly.")
+
 
 
 class Contract(BaseModel):
