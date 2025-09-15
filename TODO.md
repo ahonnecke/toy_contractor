@@ -1,5 +1,12 @@
 # TODO: Next Iteration Improvements
 
+## 0. Database and API
+- [x] switch from sqlite to redis
+- [ ] Add revision tracking to the schema
+- [ ] change list contracts to only list the most recent version of a contract, ignore the past revisions
+- [ ] add list revisions to api (takes a contract id)
+- [ ] add the inputted language to the db (so for a revision we record the NLP intput
+
 ## 1. Multi-Tenancy with JWT + Quotas (Redis)
 - [ ] Add **Auth0 / simple JWT auth** in FastAPI (use `fastapi-jwt-auth`).
 - [ ] Define `tenant_id` claim in JWT; attach it to every request via FastAPI dependency.
