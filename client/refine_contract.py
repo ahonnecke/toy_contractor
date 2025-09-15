@@ -63,7 +63,7 @@ def refine_contract(
                         print(f"ID: {original.get('id')}")
                         print(f"Title: {original.get('title')}")
                         print(f"Content: {original.get('content')[:100]}...")
-                except:
+                except Exception as e:
                     pass
 
                 return None
