@@ -1,17 +1,14 @@
 name: contractgen
 
 services:
-  db:
-    image: alpine:3.20
-    command:
-      [
-        "/bin/sh",
-        "-c",
-        "mkdir -p /data && touch /data/contracts.db && tail -f /dev/null",
-      ]
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
     volumes:
-      - contracts_data:/data
+      - redis_data:/data
     restart: unless-stopped
+    ports:
+      - "6379:6379"
 
   ollama:
     image: ollama/ollama:latest
@@ -26,19 +23,19 @@ services:
       context: ./app
       dockerfile: Dockerfile
     depends_on:
-      db:
+      redis:
         condition: service_started
       ollama:
         condition: service_started
     environment:
-      - DB_PATH=/data/contracts.db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
       - PROVIDER=ollama
       - MODEL=mistral:7b
       - OLLAMA_HOST=http://ollama:11434
       - UVICORN_HOST=0.0.0.0
       - UVICORN_PORT=8000
-    volumes:
-      - contracts_data:/data
+    # No need to mount the Redis data volume to the API container
     ports:
       - "8000:8000"
     restart: unless-stopped
@@ -60,5 +57,5 @@ services:
     command: ["tail"]
 
 volumes:
-  contracts_data:
+  redis_data:
   ollama_data:
