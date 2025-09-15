@@ -3,7 +3,7 @@
 ```
 root@49a4614e3469:/app/client# ahonnecke@antonym:~/src/agiloft_clone$ docker compose exec -it client /bin/bash
 root@ede73b7c42d3:/app# python ./
-api_client.py  client/        entrypoint.sh  test_api.py    
+api_client.py  client/        entrypoint.sh  test_api.py
 root@ede73b7c42d3:/app# cd client/
 root@ede73b7c42d3:/app/client# ls -l
 total 32
@@ -14,16 +14,16 @@ total 32
 -rwxrwxr-x 1 1000 1000 1572 Sep 14 22:40 list_contracts.py
 -rwxrwxr-x 1 1000 1000 2810 Sep 14 22:39 refine_contract.py
 -rwxrwxr-x 1 1000 1000 2296 Sep 14 18:30 test_api.py
-root@ede73b7c42d3:/app/client# ./health_check.py 
+root@ede73b7c42d3:/app/client# ./health_check.py
 Checking API health at http://api:8000/health
 Attempt 1/10
 Status code: 200
 Response: {"status":"healthy"}
 
 API is healthy!
-root@ede73b7c42d3:/app/client# 
-root@ede73b7c42d3:/app/client# 
-root@ede73b7c42d3:/app/client# ./create_contract.py 
+root@ede73b7c42d3:/app/client#
+root@ede73b7c42d3:/app/client#
+root@ede73b7c42d3:/app/client# ./create_contract.py
 Usage: python create_contract.py <title> <description> [base_url]
 root@ede73b7c42d3:/app/client# python create_contract.py "Software Agreement" "Create a software development agreement between a client and a developer."
 Creating contract: Software Agreement
@@ -103,9 +103,9 @@ Title                              Title
 [Schedule A - Scope of Work]
 [Schedule B - Payment Schedule]
 [Schedule C - Dispute Resolution Process]
-root@ede73b7c42d3:/app/client# 
-root@ede73b7c42d3:/app/client# 
-root@ede73b7c42d3:/app/client# python ./list_contracts.py 
+root@ede73b7c42d3:/app/client#
+root@ede73b7c42d3:/app/client#
+root@ede73b7c42d3:/app/client# python ./list_contracts.py
 Listing all contracts from http://api:8000/contracts/
 Attempt 1/5
 
@@ -199,6 +199,5 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
                             _______________________________
                             Name: __________________________
                             Title: __________________________
-root@ede73b7c42d3:/app/client# 
+root@ede73b7c42d3:/app/client#
 ```
-

@@ -47,5 +47,3 @@
 - [ ] Cache LLM outputs (Redis key = hash of prompt).
 - [ ] Add tracing (OpenTelemetry) for FastAPI + Redis + Mistral calls.
 - [ ] Dashboard: show which tenants use the most tokens and top search queries.
-
-

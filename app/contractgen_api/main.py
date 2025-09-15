@@ -1,6 +1,5 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-import os
 import asyncio
 from typing import List, Optional
 
@@ -17,7 +16,7 @@ async def startup_event():
     print("Initializing database...")
     await db.init_db()
     print("Database initialized successfully.")
-    
+
     # Just check if Ollama is reachable without generating text
     print("Checking if Ollama service is reachable...")
     try:
@@ -26,10 +25,13 @@ async def startup_event():
         print("Ollama service is reachable.")
     except Exception as e:
         print(f"Warning: Ollama connection check failed: {e}")
-        print("API will continue to run, but contract generation may not work properly.")
-    
+        print(
+            "API will continue to run, but contract generation may not work properly."
+        )
+
     # Start a background task to warm up the model
     asyncio.create_task(warm_up_model())
+
 
 async def warm_up_model():
     """Warm up the LLM model in the background"""
@@ -40,7 +42,6 @@ async def warm_up_model():
         print("Model warm-up complete.")
     except Exception as e:
         print(f"Model warm-up failed: {e}")
-
 
 
 class Contract(BaseModel):
@@ -70,10 +71,10 @@ async def create_contract(request: ContractRequest):
     try:
         # Use LLM to generate contract content
         content = await llm.generate_contract(request.description)
-        
+
         # Save to database
         contract_id = await db.save_contract(request.title, content)
-        
+
         return Contract(id=contract_id, title=request.title, content=content)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -117,24 +118,24 @@ async def refine_contract(request: RefinementRequest):
         existing_contract = await db.get_contract(request.contract_id)
         if not existing_contract:
             raise HTTPException(status_code=404, detail="Contract not found")
-        
-        # Create refinement prompt
-        refinement_prompt = f"""Original Contract: 
-{existing_contract['content']}
 
-Refinement Instructions: 
+        # Create refinement prompt
+        refinement_prompt = f"""Original Contract:
+{existing_contract["content"]}
+
+Refinement Instructions:
 {request.refinement_instructions}
 
 Please provide a complete, refined version of this contract that incorporates the refinement instructions.
 """
-        
+
         # Generate refined content
         refined_content = await llm.generate_contract(refinement_prompt)
-        
+
         # Save refined contract
         refined_title = f"{existing_contract['title']} (Refined)"
         contract_id = await db.save_contract(refined_title, refined_content)
-        
+
         return Contract(id=contract_id, title=refined_title, content=refined_content)
     except Exception as e:
         if isinstance(e, HTTPException):

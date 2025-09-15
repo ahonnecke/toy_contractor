@@ -4,20 +4,21 @@ import requests
 import sys
 import time
 
+
 def check_health(base_url="http://api:8000", max_retries=10, retry_delay=2):
     """
     Check the health of the API service
-    
+
     Args:
         base_url: Base URL of the API service
         max_retries: Maximum number of retries
         retry_delay: Delay between retries in seconds
     """
     print(f"Checking API health at {base_url}/health")
-    
+
     for attempt in range(max_retries):
         try:
-            print(f"Attempt {attempt+1}/{max_retries}")
+            print(f"Attempt {attempt + 1}/{max_retries}")
             response = requests.get(f"{base_url}/health", timeout=5)
             print(f"Status code: {response.status_code}")
             print(f"Response: {response.text}")
@@ -31,6 +32,7 @@ def check_health(base_url="http://api:8000", max_retries=10, retry_delay=2):
             else:
                 print(f"Failed after {max_retries} attempts")
                 return False
+
 
 if __name__ == "__main__":
     # Use command line argument as base URL if provided

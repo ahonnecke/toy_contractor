@@ -1,6 +1,5 @@
 import os
 import httpx
-from typing import Dict, Any
 
 # Get configuration from environment variables
 PROVIDER = os.environ.get("PROVIDER", "ollama")
@@ -21,16 +20,16 @@ async def _generate_with_ollama(description: str) -> str:
     # For testing/development, return a mock response if the description is too long
     if len(description) > 500:
         return f"Mock contract for: {description[:100]}..."
-    
+
     prompt = f"""
-    You are a legal expert specializing in contract generation. Create a comprehensive and legally sound contract based on the following description:  
-    
+    You are a legal expert specializing in contract generation. Create a comprehensive and legally sound contract based on the following description:
+
     {description}
-    
+
     The contract should include all necessary legal clauses, terms, and conditions appropriate for this type of agreement.
     Format the contract professionally with proper sections, numbering, and legal terminology.
     """
-    
+
     # Use a much longer timeout for the entire client session
     async with httpx.AsyncClient(timeout=300.0) as client:
         try:
@@ -40,11 +39,11 @@ async def _generate_with_ollama(description: str) -> str:
                 json={
                     "model": MODEL,
                     "prompt": "Generate a simple test contract",
-                    "stream": False
+                    "stream": False,
                 },
-                timeout=300.0  # 5 minutes timeout
+                timeout=300.0,  # 5 minutes timeout
             )
-            
+
             if response.status_code != 200:
                 # If the model doesn't exist, try to pull it
                 if "model not found" in response.text.lower():
@@ -53,7 +52,7 @@ async def _generate_with_ollama(description: str) -> str:
                         pull_response = await client.post(
                             f"{OLLAMA_HOST}/api/pull",
                             json={"name": MODEL},
-                            timeout=600.0  # 10 minutes timeout for pulling
+                            timeout=600.0,  # 10 minutes timeout for pulling
                         )
                         print(f"Pull response: {pull_response.status_code}")
                     except Exception as e:
@@ -64,27 +63,23 @@ async def _generate_with_ollama(description: str) -> str:
                     print(f"Ollama API error: {response.text}")
                     # Return a fallback response for development
                     return f"Ollama API error. Using mock contract for: {description[:100]}..."
-            
+
             # Now try with the actual prompt
             response = await client.post(
                 f"{OLLAMA_HOST}/api/generate",
-                json={
-                    "model": MODEL,
-                    "prompt": prompt,
-                    "stream": False
-                },
-                timeout=300.0  # 5 minutes timeout
+                json={"model": MODEL, "prompt": prompt, "stream": False},
+                timeout=300.0,  # 5 minutes timeout
             )
-            
+
             if response.status_code != 200:
                 raise Exception(f"Ollama API error: {response.text}")
-            
+
             result = response.json()
             # Handle different response formats
             if "message" in result:
                 return result.get("message", {}).get("content", "")
             return result.get("response", "")
-            
+
         except httpx.TimeoutException:
             print("Request to Ollama timed out")
             # Return a fallback response for development
@@ -98,7 +93,7 @@ async def _generate_with_ollama(description: str) -> str:
 async def check_ollama_connection() -> bool:
     """
     Check if the Ollama service is reachable without generating text
-    
+
     Returns:
         bool: True if Ollama is reachable, False otherwise
     """
